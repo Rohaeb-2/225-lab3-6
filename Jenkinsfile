@@ -56,17 +56,15 @@ pipeline {
         }
 
         stage("Run Acceptance Tests") {
-            steps {
-                script {
-                    sh 'docker stop qa-tests || true'
-                    sh 'docker rm qa-tests || true'
-                    sh 'docker build -t qa-tests -f Dockerfile.test .'
-                    sh 'docker run qa-tests'
-                    sh 'docker stop qa-tests || true'
-                    sh 'docker rm qa-tests || true'
-                }
-            }
+    steps {
+        script {
+            // Build test container without Docker login
+            sh 'docker build --pull --no-cache -t qa-tests -f Dockerfile.test .'
+            // Run Selenium tests
+            sh 'docker run --rm qa-tests'
         }
+    }
+}
 
         stage('Deploy to Prod Environment') {
             steps {
